@@ -1,9 +1,9 @@
 package com.example.diploma.controllers;
 
-import com.example.diploma.model.db.entity.Customer;
 import com.example.diploma.model.dto.request.CarInfoRequest;
 import com.example.diploma.model.dto.response.CarInfoResponse;
 import com.example.diploma.service.impl.carImpl.CarService;
+import com.example.diploma.service.impl.customerImpl.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +19,7 @@ import java.util.List;
 public class CarController {
 
     private final CarService carService;
+    private final CustomerService customerService;
 
     @PostMapping
     @Operation(summary = "Создание автомобиля")
@@ -64,10 +65,10 @@ public class CarController {
     }
 
 
-    @PostMapping("/{id}/rent")
+    @PutMapping("/select/{carId}/{customerId}")
     @Operation(summary = "Присвоение автомобиля пользователю")
-    public CarInfoResponse selectCar(@PathVariable Long id, @RequestBody Customer customer) {
-        return carService.selectCar(id, customer);
+    public CarInfoResponse selectCar(@PathVariable Long carId, @PathVariable Long customerId) {
+        return carService.selectCar(carId, customerId);
     }
 
 }

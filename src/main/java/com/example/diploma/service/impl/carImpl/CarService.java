@@ -1,6 +1,5 @@
 package com.example.diploma.service.impl.carImpl;
 
-import com.example.diploma.model.db.entity.Customer;
 import com.example.diploma.model.dto.request.CarInfoRequest;
 import com.example.diploma.model.dto.response.CarInfoResponse;
 
@@ -14,7 +13,5 @@ public interface CarService {
     List<CarInfoResponse> getAllCars();
 
     List<CarInfoResponse> getFilterCars(String brand, String transmission, Integer year, Double price, String bodyType);
-
-
-    CarInfoResponse selectCar(Long id, Customer customer);
+    CarInfoResponse selectCar(Long carId, Long customerId);
 }

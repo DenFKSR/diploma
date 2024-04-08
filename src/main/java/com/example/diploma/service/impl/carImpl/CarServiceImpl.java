@@ -4,9 +4,11 @@ import com.example.diploma.exceptions.CustomException;
 import com.example.diploma.model.db.entity.Car;
 import com.example.diploma.model.db.entity.Customer;
 import com.example.diploma.model.db.repository.CarRepo;
+import com.example.diploma.model.db.repository.CustomerRepo;
 import com.example.diploma.model.dto.enums.car.Condition;
 import com.example.diploma.model.dto.request.CarInfoRequest;
 import com.example.diploma.model.dto.response.CarInfoResponse;
+import com.example.diploma.model.dto.response.CustomerInfoResponse;
 import com.example.diploma.service.impl.customerImpl.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,8 @@ import java.util.stream.Collectors;
 public class CarServiceImpl implements CarService {
     private final CarRepo carRepo;
     private final ObjectMapper mapper;
-    private final CustomerService customerService;
+private final CustomerRepo customerRepo;
+private final CustomerService customerService;
     public static final String ERR_MSG = "car not found";
 
     @Override
@@ -36,6 +39,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarInfoResponse getCar(Long id) {
+
         return mapper.convertValue(carRepo.findById(id), CarInfoResponse.class);
     }
 
@@ -88,12 +92,20 @@ public class CarServiceImpl implements CarService {
 
 
     @Override
-    public CarInfoResponse selectCar(Long id, Customer customer) {
-        Car car = mapper.convertValue(getCar(id), Car.class);
-        carRepo.findById(id).orElseThrow(() -> new CustomException(ERR_MSG, HttpStatus.NOT_FOUND));
+    public CarInfoResponse selectCar(Long carId, Long customerId) {
+        Car car = mapper.convertValue(getCar(carId), Car.class);
+        carRepo.findById(carId).orElseThrow(() -> new CustomException(ERR_MSG, HttpStatus.NOT_FOUND));
+        Customer customer = mapper.convertValue(customerService.getCustomer(customerId), Customer.class) ;
+        customerRepo.findById(customerId).orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND));
+        customer.getCar().add(car);
+        //customerRepo.save(customer);
         car.setCustomer(customer);
         car = carRepo.save(car);
-        return mapper.convertValue(car, CarInfoResponse.class);
-
+        CustomerInfoResponse customerInfoResponse = mapper.convertValue(customer, CustomerInfoResponse.class);
+        CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
+        carInfoResponse.setCustomer(customerInfoResponse);
+        return carInfoResponse;
     }
 }
+
+//CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);

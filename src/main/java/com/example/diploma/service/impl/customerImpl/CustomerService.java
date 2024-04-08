@@ -7,10 +7,15 @@ import java.util.List;
 
 public interface CustomerService {
     CustomerInfoResponse addCustomer(CustomerInfoRequest request);
+
     CustomerInfoResponse getCustomer(Long id);
-    CustomerInfoResponse updateCustomer (Long id, CustomerInfoRequest request);
-    CustomerInfoResponse setStatus(Long id);
-    CustomerInfoResponse setDeal(Long id);
+
+    CustomerInfoResponse getCustomer(String email);
+
+    CustomerInfoResponse updateCustomer(Long id, CustomerInfoRequest request);
+
+
+
     List<CustomerInfoResponse> getAllCustomer();
 
 

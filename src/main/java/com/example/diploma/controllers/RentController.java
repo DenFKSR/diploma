@@ -14,9 +14,10 @@ public class RentController {
 
     private final RentService rentService;
 
-    @PostMapping
+    @PostMapping("/create_rent")
     @Operation(summary = "фильтр списка автомобилей")
     public RentInfoResponse rentCar(@RequestBody RentInfoRequest rentInfoRequest) {
         return rentService.rent(rentInfoRequest);
     }
+
 }

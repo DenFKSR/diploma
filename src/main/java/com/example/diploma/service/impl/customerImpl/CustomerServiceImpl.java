@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepo customerRepo;
     private final ObjectMapper mapper;
 
-    private PasswordEncoder passwordEncoder;
+   // private PasswordEncoder passwordEncoder;
 
 
 
@@ -40,11 +39,16 @@ public class CustomerServiceImpl implements CustomerService {
                 .ifPresent(customer -> {
                     throw new CustomException("Email already exists", HttpStatus.CONFLICT);//исключение:добавление повтор. пользователя
                 });
+        String numLicense = request.getSerialNumLicense();
+        if (numLicense.length()!=10 || !numLicense.matches("\\d{10}")){
+            throw  new CustomException("The driver's license number is incorrect. The number must contain only numbers and no more than 10 characters", HttpStatus.BAD_REQUEST);
+
+        }
         Customer customer = mapper.convertValue(request, Customer.class);
         customer.setCustomerCondition(CustomerCondition.CREATED);
         customer.setRoles("USER");
         customer.setCreatedAt(LocalDateTime.now());
-        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        customer.setPassword(customer.getPassword());
         customer = customerRepo.save(customer);
         return mapper.convertValue(customer, CustomerInfoResponse.class);
     }
@@ -53,6 +57,13 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerInfoResponse getCustomer(Long id) {
         return mapper.convertValue(customerRepo.findById(id), CustomerInfoResponse.class);
     }
+
+    @Override
+    public CustomerInfoResponse getCustomer(String email) {
+        return mapper.convertValue(customerRepo.findByEmail(email), CustomerInfoResponse.class);
+    }
+
+
 
     @Override
     public CustomerInfoResponse updateCustomer(Long id, CustomerInfoRequest request) {
@@ -70,16 +81,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     }
 
-    @Override
-    public CustomerInfoResponse setStatus(Long id) {// статус который устанавливает манагер
-        return null;
-    }
 
-    @Override
-    public CustomerInfoResponse setDeal(Long id) {
-
-        return null;
-    }
 
     @Override
     public void deleteCustomer(Long id) {

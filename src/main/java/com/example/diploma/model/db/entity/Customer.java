@@ -2,6 +2,7 @@ package com.example.diploma.model.db.entity;
 
 import com.example.diploma.model.dto.enums.customer.CustomerCondition;
 import com.example.diploma.model.dto.enums.customer.CustomerStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -11,6 +12,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -58,4 +60,12 @@ public class Customer {
     private CustomerStatus status;
     @Column(name = "roles")
     private String roles;
+
+    @OneToMany
+    @JsonManagedReference
+    List<Car> car;
+
+
+
+
 }

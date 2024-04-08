@@ -54,4 +54,7 @@ public class RentServiceImpl implements RentService {
 
         return new RentInfoResponse(rentInfoSaved.getId(), rentInfoSaved.getCar().getId(), rentInfoSaved.getCustomer().getId(), rentInfoSaved.getStartDateRent(),rentInfoSaved.getEndDateRent(), rentInfoSaved.getCost());
     }
+
+
+
 }

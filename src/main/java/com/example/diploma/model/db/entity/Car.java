@@ -76,7 +76,7 @@ public class Car {
 
 
     @ManyToOne
-    @JsonBackReference(value = "driver_cars")
+    @JsonBackReference
     Customer customer;
 
 }
