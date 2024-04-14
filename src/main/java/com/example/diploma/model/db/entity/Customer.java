@@ -1,7 +1,7 @@
 package com.example.diploma.model.db.entity;
 
 import com.example.diploma.model.dto.enums.customer.CustomerCondition;
-import com.example.diploma.model.dto.enums.customer.CustomerStatus;
+import com.example.diploma.model.dto.enums.customer.Status;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -57,13 +57,18 @@ public class Customer {
 
     @Column(name = "customer_status")//free, banned....
     @Enumerated(EnumType.STRING)
-    private CustomerStatus status;
+    private Status status;
+
+
+
     @Column(name = "roles")
     private String roles;
 
     @OneToMany
     @JsonManagedReference
     List<Car> car;
+
+
 
 
 

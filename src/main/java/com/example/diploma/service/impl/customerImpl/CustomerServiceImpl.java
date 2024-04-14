@@ -4,6 +4,7 @@ import com.example.diploma.exceptions.CustomException;
 import com.example.diploma.model.db.entity.Customer;
 import com.example.diploma.model.db.repository.CustomerRepo;
 import com.example.diploma.model.dto.enums.customer.CustomerCondition;
+import com.example.diploma.model.dto.enums.customer.Status;
 import com.example.diploma.model.dto.request.CustomerInfoRequest;
 import com.example.diploma.model.dto.response.CustomerInfoResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +38,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         customerRepo.findByEmail(request.getEmail())
                 .ifPresent(customer -> {
-                    throw new CustomException("Email already exists", HttpStatus.CONFLICT);//исключение:добавление повтор. пользователя
+                    throw new CustomException("Email already exists", HttpStatus.CONFLICT);
                 });
         String numLicense = request.getSerialNumLicense();
         if (numLicense.length()!=10 || !numLicense.matches("\\d{10}")){
@@ -46,6 +47,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         Customer customer = mapper.convertValue(request, Customer.class);
         customer.setCustomerCondition(CustomerCondition.CREATED);
+        customer.setStatus(Status.valueOf("FREE"));
         customer.setRoles("USER");
         customer.setCreatedAt(LocalDateTime.now());
         customer.setPassword(customer.getPassword());

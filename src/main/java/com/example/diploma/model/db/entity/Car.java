@@ -73,7 +73,10 @@ public class Car {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     LocalDateTime updatedAt;
 
-
+    @Column(name = "created_at")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    LocalDateTime createdAt;
 
     @ManyToOne
     @JsonBackReference

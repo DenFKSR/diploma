@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,6 +20,7 @@ import java.util.List;
 public class CarController {
 
     private final CarService carService;
+    private final ArrayList carInfo;
     private final CustomerService customerService;
 
     @PostMapping
@@ -69,6 +71,14 @@ public class CarController {
     @Operation(summary = "Присвоение автомобиля пользователю")
     public CarInfoResponse selectCar(@PathVariable Long carId, @PathVariable Long customerId) {
         return carService.selectCar(carId, customerId);
+    }
+
+
+    @PutMapping ("/location/{id}")
+    @Operation(summary = "Выбор автомобиля")
+    public ArrayList getAddress(@PathVariable Long id) {
+
+        return carService.getAddress(id);
     }
 
 }

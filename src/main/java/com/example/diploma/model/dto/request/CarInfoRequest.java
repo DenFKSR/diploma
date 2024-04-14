@@ -50,4 +50,5 @@ public class CarInfoRequest {
 
   // @NotBlank
     private String registerNumber;
+
 }

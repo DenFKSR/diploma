@@ -1,6 +1,6 @@
 package com.example.diploma.model.dto.enums.customer;
 
-public enum CustomerStatus {
+public enum Status {
     FREE,
     RENTER,
     BANNED

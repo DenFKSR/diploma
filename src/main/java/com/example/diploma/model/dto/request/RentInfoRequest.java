@@ -19,4 +19,8 @@ public class RentInfoRequest {
     private LocalDate startDateRent;
 
     private LocalDate endDateRent;
+
+    private String email;
+    private String feedback;
+
 }

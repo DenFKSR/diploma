@@ -6,6 +6,7 @@ import com.example.diploma.model.db.entity.Customer;
 import com.example.diploma.model.db.repository.CarRepo;
 import com.example.diploma.model.db.repository.CustomerRepo;
 import com.example.diploma.model.dto.enums.car.Condition;
+import com.example.diploma.model.dto.enums.car.Status;
 import com.example.diploma.model.dto.request.CarInfoRequest;
 import com.example.diploma.model.dto.response.CarInfoResponse;
 import com.example.diploma.model.dto.response.CustomerInfoResponse;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,14 +35,20 @@ private final CustomerService customerService;
 
     @Override
     public CarInfoResponse addCar(CarInfoRequest request) {
+        carRepo.findByRegisterNumber(request.getRegisterNumber())
+                .ifPresent(car -> {
+                    throw new CustomException("Car already exists", HttpStatus.CONFLICT);
+                });
         Car car = mapper.convertValue(request, Car.class);
+        car.setCondition(Condition.CREATED);
+        car.setStatus(Status.FREE);
+        car.setCreatedAt(LocalDateTime.now());
         car = carRepo.save(car);
         return mapper.convertValue(car, CarInfoResponse.class);
     }
 
     @Override
     public CarInfoResponse getCar(Long id) {
-
         return mapper.convertValue(carRepo.findById(id), CarInfoResponse.class);
     }
 
@@ -97,15 +106,50 @@ private final CustomerService customerService;
         carRepo.findById(carId).orElseThrow(() -> new CustomException(ERR_MSG, HttpStatus.NOT_FOUND));
         Customer customer = mapper.convertValue(customerService.getCustomer(customerId), Customer.class) ;
         customerRepo.findById(customerId).orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND));
-        customer.getCar().add(car);
-        //customerRepo.save(customer);
+        customer.setCar(List.of(car));
         car.setCustomer(customer);
+        car.setStatus(Status.ORDERED);
         car = carRepo.save(car);
         CustomerInfoResponse customerInfoResponse = mapper.convertValue(customer, CustomerInfoResponse.class);
         CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
         carInfoResponse.setCustomer(customerInfoResponse);
         return carInfoResponse;
     }
+    @Override
+    public ArrayList  getAddress(Long id) {
+        Car car = mapper.convertValue(getCar(id), Car.class);
+        double number = Math.random() * 100;
+        int num2 = (int) number;
+        double memArray = Math.random() * 10;
+        int memArray2 = (int) memArray;
+        ArrayList<String> lottery = new ArrayList<>();
+        lottery.add("Адмиралтейская наб, дом " + num2);
+        lottery.add("Бойцова пер., дом " + num2);
+        lottery.add("Бумажная ул., дом " + num2);
+        lottery.add("Введенский канал, дом " + num2);
+        lottery.add("Володи Ермака ул., дом " + num2);
+        lottery.add("Гороховая ул., дом " + num2);
+        lottery.add("Дворцовый проезд, дом " + num2);
+        lottery.add("Дерптский пер., дом " + num2);
+        lottery.add("Дровяной пер., дом " + num2);
+        lottery.add("Измайловский просп., дом " + num2);
+        lottery.add("Малый Казачий пер., дом " + num2);
+        lottery.add("Константина Заслонова ул., дом " + num2);
+        Collections.shuffle(lottery);
+        car.setAddress(lottery.get(memArray2));
+        carRepo.save(car);
+        ArrayList<String> info = new ArrayList<>();
+        info.add(car.getBrand());
+        info.add(car.getModel());
+        info.add(car.getRegisterNumber());
+        info.add(car.getAddress());
+        return info;
+    }
+
+
+
+
+
+
 }
 
-//CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
