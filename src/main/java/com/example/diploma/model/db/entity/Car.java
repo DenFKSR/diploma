@@ -1,7 +1,9 @@
 package com.example.diploma.model.db.entity;
 
+import com.example.diploma.model.db.entity.images.Image;
 import com.example.diploma.model.dto.enums.car.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -78,8 +80,14 @@ public class Car {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     LocalDateTime createdAt;
 
-    @ManyToOne
-    @JsonBackReference
-    Customer customer;
 
+    @OneToOne
+    @JsonManagedReference
+//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
+//    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
+
+    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
+    @JsonBackReference(value = "rent")
+    private RentInfo rent;
 }

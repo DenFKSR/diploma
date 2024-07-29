@@ -3,9 +3,9 @@ package com.example.diploma.controllers;
 import com.example.diploma.model.dto.request.CarInfoRequest;
 import com.example.diploma.model.dto.response.CarInfoResponse;
 import com.example.diploma.service.impl.carImpl.CarService;
-import com.example.diploma.service.impl.customerImpl.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +20,7 @@ import java.util.List;
 public class CarController {
 
     private final CarService carService;
-    private final ArrayList carInfo;
-    private final CustomerService customerService;
-
-    @PostMapping
+    @PostMapping("/add")
     @Operation(summary = "Создание автомобиля")
     public CarInfoResponse addCar(@RequestBody CarInfoRequest request) {
         return carService.addCar(request);
@@ -35,11 +32,17 @@ public class CarController {
         return carService.getAllCars();
     }
 
-
     @GetMapping("/{id}")
-    @Operation(summary = "Выбор автомобиля")
+    @Operation(summary = "Выбор автомобиля(все данные для администрации)")
     public CarInfoResponse getCar(@PathVariable Long id) {
         return carService.getCar(id);
+    }
+
+
+    @GetMapping("/new/{id}")
+    @Operation(summary = "Выбор автомобиля для пользователя")
+    public List<String> getNewCar(@PathVariable Long id) {
+        return carService.getNewCar(id);
     }
 
     @PutMapping("/{id}")
@@ -59,26 +62,22 @@ public class CarController {
         return carService.getFilterCars(brand, transmission, year, price, bodyType);
     }
 
-
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление данных автомобиля")
     public void deleteCar(@PathVariable Long id) {
         carService.deleteCar(id);
     }
 
-
-    @PutMapping("/select/{carId}/{customerId}")
-    @Operation(summary = "Присвоение автомобиля пользователю")
-    public CarInfoResponse selectCar(@PathVariable Long carId, @PathVariable Long customerId) {
-        return carService.selectCar(carId, customerId);
-    }
-
-
-    @PutMapping ("/location/{id}")
+    @PutMapping("/location/{id}")
     @Operation(summary = "Выбор автомобиля")
     public ArrayList getAddress(@PathVariable Long id) {
-
         return carService.getAddress(id);
     }
 
+
+    @GetMapping("/get_image/{id}")
+    @Operation(summary = "получить изображение по автомобилю")
+    public ResponseEntity<?> getImageByCar(@PathVariable Long id) {
+        return carService.getImageByCar(id);
+    }
 }

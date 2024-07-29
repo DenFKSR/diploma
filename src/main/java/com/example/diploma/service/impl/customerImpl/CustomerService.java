@@ -13,11 +13,7 @@ public interface CustomerService {
     CustomerInfoResponse getCustomer(String email);
 
     CustomerInfoResponse updateCustomer(Long id, CustomerInfoRequest request);
-
-
-
     List<CustomerInfoResponse> getAllCustomer();
-
 
     void deleteCustomer(Long id);
 }

@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
-    @PostMapping("/addCustomer")
+    @PostMapping("/add")
     @Operation(summary = "Регистрация пользователя")
     public CustomerInfoResponse addCustomer(@RequestBody CustomerInfoRequest request) {
         return customerService.addCustomer(request);
@@ -43,7 +43,6 @@ public class CustomerController {
     public CustomerInfoResponse updateCustomer(@PathVariable Long id, @RequestBody @Valid CustomerInfoRequest request) {
         return customerService.updateCustomer(id, request);
     }
-
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление пользователя")
     public void deleteCustomer(@PathVariable Long id) {

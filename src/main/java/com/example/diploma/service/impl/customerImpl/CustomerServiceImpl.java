@@ -26,10 +26,6 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepo customerRepo;
     private final ObjectMapper mapper;
 
-   // private PasswordEncoder passwordEncoder;
-
-
-
     @Override
     public CustomerInfoResponse addCustomer(CustomerInfoRequest request) {
         String email = request.getEmail();
@@ -65,8 +61,6 @@ public class CustomerServiceImpl implements CustomerService {
         return mapper.convertValue(customerRepo.findByEmail(email), CustomerInfoResponse.class);
     }
 
-
-
     @Override
     public CustomerInfoResponse updateCustomer(Long id, CustomerInfoRequest request) {
         Customer customer = mapper.convertValue(getCustomer(id), Customer.class);
@@ -82,8 +76,6 @@ public class CustomerServiceImpl implements CustomerService {
         return mapper.convertValue(customer, CustomerInfoResponse.class);
 
     }
-
-
 
     @Override
     public void deleteCustomer(Long id) {

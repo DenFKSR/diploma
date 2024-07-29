@@ -11,16 +11,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RentInfoRequest {
-
     private Long carId;
-
     private Long customerId;
 
+
     private LocalDate startDateRent;
-
     private LocalDate endDateRent;
-
-    private String email;
-    private String feedback;
+    //private String email;
+   // private String feedback;
 
 }

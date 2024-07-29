@@ -9,7 +9,6 @@ import com.example.diploma.model.db.repository.CarRepo;
 import com.example.diploma.model.db.repository.CustomerRepo;
 import com.example.diploma.model.db.repository.RentInfoRepo;
 import com.example.diploma.model.dto.enums.car.Condition;
-import com.example.diploma.model.dto.enums.car.Status;
 import com.example.diploma.model.dto.enums.rent.RentStatus;
 import com.example.diploma.model.dto.request.RentInfoRequest;
 import com.example.diploma.model.dto.response.RentInfoResponse;
@@ -36,7 +35,7 @@ public class RentServiceImpl implements RentService {
     public static final String ERR_MSG = "deal rent not found";
 
     @Override
-    public RentInfoResponse addRent(RentInfoRequest rentInfoRequest) {
+    public RentInfo addRent(RentInfoRequest rentInfoRequest) {
         RentInfo rentInfo = mapper.convertValue(rentInfoRequest, RentInfo.class);
         Car car = mapper.convertValue(carRepo.findById(rentInfoRequest.getCarId()), Car.class);
         List<RentInfoResponse> rentInfo1 = getRentByCar(rentInfoRequest.getCarId());
@@ -56,18 +55,28 @@ public class RentServiceImpl implements RentService {
         }
         customer.setStatus(com.example.diploma.model.dto.enums.customer.Status.valueOf("RENTER"));
         rentInfo.setEmail(customer.getEmail());
+        rentInfo.setCar(car);
+        rentInfo.setCustomer(customer);
         rentInfo.setCondition(Condition.CREATED);
+        rentInfo.setRentStatus(RentStatus.OPEN);//КОГДА ЗАДАВАТЬ СТАТУС
         rentInfo.setCreatedAt(LocalDateTime.now());
         rentInfo.setCost(car.getPrice()
                 .multiply(BigDecimal.valueOf(ChronoUnit.DAYS.between(rentInfoRequest.getStartDateRent(), rentInfoRequest.getEndDateRent()))));
-        customer = customerRepo.save(customer);
         rentInfo = rentInfoRepo.save(rentInfo);
-        return mapper.convertValue(rentInfo, RentInfoResponse.class);
+        return rentInfo;
     }
 
     @Override
     public RentInfoResponse getRent(Long id) {
-        return mapper.convertValue(rentInfoRepo.findById(id), RentInfoResponse.class);
+        return  mapper.convertValue(rentInfoRepo.findById(id), RentInfoResponse.class);
+    }
+
+    @Override
+    public RentInfoResponse getRentForCustomer(String email) {
+
+
+
+        return mapper.convertValue(rentInfoRepo.findByEmail(email), RentInfoResponse.class);
     }
 
     @Override
@@ -85,6 +94,9 @@ public class RentServiceImpl implements RentService {
                 .collect(Collectors.toList());
 
     }
+
+
+
     @Override
     public void deleteRent(Long id) {
         RentInfo rent = mapper.convertValue(getRent(id), RentInfo.class);
@@ -93,22 +105,21 @@ public class RentServiceImpl implements RentService {
         rent.setUpdatedAt(LocalDateTime.now());
         rentInfoRepo.save(rent);
     }
-    @Override
-    public  RentInfoResponse closeRent(Long id, RentInfoRequest request){
-        if (rentInfoRepo.findById(id).isEmpty()){
-            throw new CustomException("такой сделки не существует", HttpStatus.CONFLICT);
-        }
-        RentInfo rent = mapper.convertValue(getRent(id), RentInfo.class);
-        rent.setRentStatus(RentStatus.CLOSED);
-        Car car = mapper.convertValue(carRepo.findById(rent.getCarId()), Car.class);
-        car.setStatus(Status.FREE);
-        Customer customer = mapper
-                .convertValue(customerRepo.findById(rent.getCustomerId()), Customer.class);
-        customer.setStatus(com.example.diploma.model.dto.enums.customer.Status.FREE);
-        rent.setFeedback(request.toString());
-        return  mapper.convertValue(rent, RentInfoResponse.class);
-
-    }
+//    @Override
+//    public  RentInfoResponse closeRent(Long id, RentInfoRequest request){
+//        if (rentInfoRepo.findById(id).isEmpty()){
+//            throw new CustomException("такой сделки не существует", HttpStatus.CONFLICT);
+//        }
+//        RentInfo rent = mapper.convertValue(getRent(id), RentInfo.class);
+//        rent.setRentStatus(RentStatus.CLOSED);
+//        Car car = mapper.convertValue(carRepo.findById(rent.getCarId()), Car.class);
+//        car.setStatus(Status.FREE);
+//        Customer customer = mapper
+//                .convertValue(customerRepo.findById(rent.getCustomerId()), Customer.class);
+//        customer.setStatus(com.example.diploma.model.dto.enums.customer.Status.FREE);
+//        rent.setFeedback(request.toString());
+//        return  mapper.convertValue(rent, RentInfoResponse.class);
+//    }
 
 
 

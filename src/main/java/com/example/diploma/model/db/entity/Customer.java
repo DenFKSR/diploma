@@ -2,7 +2,7 @@ package com.example.diploma.model.db.entity;
 
 import com.example.diploma.model.dto.enums.customer.CustomerCondition;
 import com.example.diploma.model.dto.enums.customer.Status;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -12,7 +12,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -51,26 +50,19 @@ public class Customer {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     LocalDateTime updatedAt;
 
-    @Column(name = "condition")//create, delete....
+    @Column(name = "condition")
     @Enumerated(EnumType.STRING)
     private CustomerCondition customerCondition;
 
-    @Column(name = "customer_status")//free, banned....
+    @Column(name = "customer_status")
     @Enumerated(EnumType.STRING)
     private Status status;
-
-
 
     @Column(name = "roles")
     private String roles;
 
-    @OneToMany
-    @JsonManagedReference
-    List<Car> car;
-
-
-
-
-
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonBackReference(value = "rent")
+    private RentInfo rent;
 
 }

@@ -3,6 +3,7 @@ package com.example.diploma.model.db.repository;
 import com.example.diploma.model.db.entity.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,4 +15,8 @@ public interface CarRepo extends JpaRepository<Car, Long> {
     List<Car> findByFilters( String brand, String transmission, Integer year, Double price, String bodyType);
 
     Optional<Car> findById(Long id);
+
+    @Query("SELECT c.brand, c.model, c.price, c.transmission, c.bodyType, c.engineType, c.fuelСonsumption, c.seatsAmount FROM Car c WHERE c.id = :carId")
+    String findCarDetailsByCarId(@Param("carId") Long carId);// переделать тип метода в какой нибудь стринговый массив, так как он возвращает
+    // массив строк из столбцов
 }

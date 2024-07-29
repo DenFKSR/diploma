@@ -2,25 +2,29 @@ package com.example.diploma.service.impl.carImpl;
 
 import com.example.diploma.exceptions.CustomException;
 import com.example.diploma.model.db.entity.Car;
-import com.example.diploma.model.db.entity.Customer;
+import com.example.diploma.model.db.entity.images.Image;
 import com.example.diploma.model.db.repository.CarRepo;
-import com.example.diploma.model.db.repository.CustomerRepo;
+import com.example.diploma.model.db.repository.ImageRepo;
 import com.example.diploma.model.dto.enums.car.Condition;
 import com.example.diploma.model.dto.enums.car.Status;
 import com.example.diploma.model.dto.request.CarInfoRequest;
 import com.example.diploma.model.dto.response.CarInfoResponse;
-import com.example.diploma.model.dto.response.CustomerInfoResponse;
-import com.example.diploma.service.impl.customerImpl.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +32,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CarServiceImpl implements CarService {
     private final CarRepo carRepo;
+    private final CarsProperty carsProperty;
     private final ObjectMapper mapper;
-private final CustomerRepo customerRepo;
-private final CustomerService customerService;
-    public static final String ERR_MSG = "car not found";
+    private final ImageRepo imageRepo;
 
+    public static final String ERR_MSG = "car not found";
     @Override
     public CarInfoResponse addCar(CarInfoRequest request) {
         carRepo.findByRegisterNumber(request.getRegisterNumber())
@@ -40,16 +44,17 @@ private final CustomerService customerService;
                     throw new CustomException("Car already exists", HttpStatus.CONFLICT);
                 });
         Car car = mapper.convertValue(request, Car.class);
+        BigDecimal price = car.getPrice();
+        BigDecimal zero = new BigDecimal("0.00");
+        BigDecimal hundred = new BigDecimal("100.00");
+        if ((zero.compareTo(price) < 0) || (price.compareTo(hundred) > 0)) {
+            throw new CustomException("the price should be in the range from 0 to 100", HttpStatus.CONFLICT);
+        }
         car.setCondition(Condition.CREATED);
         car.setStatus(Status.FREE);
         car.setCreatedAt(LocalDateTime.now());
         car = carRepo.save(car);
         return mapper.convertValue(car, CarInfoResponse.class);
-    }
-
-    @Override
-    public CarInfoResponse getCar(Long id) {
-        return mapper.convertValue(carRepo.findById(id), CarInfoResponse.class);
     }
 
     @Override
@@ -72,7 +77,6 @@ private final CustomerService customerService;
         car = carRepo.save(car);
         return mapper.convertValue(car, CarInfoResponse.class);
     }
-
     @Override
     public void deleteCar(Long id) {
         Car car = mapper.convertValue(getCar(id), Car.class);
@@ -81,7 +85,10 @@ private final CustomerService customerService;
         car.setUpdatedAt(LocalDateTime.now());
         carRepo.save(car);
     }
-
+    @Override
+    public CarInfoResponse getCar(Long id) {
+        return mapper.convertValue(carRepo.findById(id), CarInfoResponse.class);
+    }
     @Override
     public List<CarInfoResponse> getAllCars() {
         return carRepo.findAll()
@@ -90,7 +97,6 @@ private final CustomerService customerService;
                 .collect(Collectors.toList());
 
     }
-
     @Override
     public List<CarInfoResponse> getFilterCars(String brand, String transmission, Integer year, Double price, String bodyType) {
         return carRepo.findByFilters(brand, transmission, year, price, bodyType)
@@ -99,24 +105,29 @@ private final CustomerService customerService;
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<String> getNewCar(Long id) {
+        return carsProperty.GetInformationCar(id);
+    }
 
     @Override
-    public CarInfoResponse selectCar(Long carId, Long customerId) {
-        Car car = mapper.convertValue(getCar(carId), Car.class);
-        carRepo.findById(carId).orElseThrow(() -> new CustomException(ERR_MSG, HttpStatus.NOT_FOUND));
-        Customer customer = mapper.convertValue(customerService.getCustomer(customerId), Customer.class) ;
-        customerRepo.findById(customerId).orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND));
-        customer.setCar(List.of(car));
-        car.setCustomer(customer);
-        car.setStatus(Status.ORDERED);
-        car = carRepo.save(car);
-        CustomerInfoResponse customerInfoResponse = mapper.convertValue(customer, CustomerInfoResponse.class);
-        CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
-        carInfoResponse.setCustomer(customerInfoResponse);
-        return carInfoResponse;
+    public ResponseEntity<?> getImageByCar(Long id) {
+        try {
+            Car car = carRepo.findById(id).orElseThrow(() -> new NoSuchElementException("File not found"));
+            Image image = car.getImage();
+            return ResponseEntity.ok()
+                    .header("fileName", image.getOriginalFileName())
+                    .contentType(MediaType.valueOf(image.getContentType()))
+                    .contentLength(image.getSize())
+                    .body(new InputStreamResource(new ByteArrayInputStream(image.getBytes())));
+        } catch (NoSuchElementException e) {
+            log.error("файл не найден");
+            return ResponseEntity.badRequest()
+                    .body("файл не найден");
+        }
     }
     @Override
-    public ArrayList  getAddress(Long id) {
+    public ArrayList getAddress(Long id) {
         Car car = mapper.convertValue(getCar(id), Car.class);
         double number = Math.random() * 100;
         int num2 = (int) number;
@@ -145,11 +156,5 @@ private final CustomerService customerService;
         info.add(car.getAddress());
         return info;
     }
-
-
-
-
-
-
 }
 
