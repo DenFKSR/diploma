@@ -2,7 +2,6 @@ package com.example.diploma.model.db.entity;
 
 import com.example.diploma.model.dto.enums.car.Condition;
 import com.example.diploma.model.dto.enums.rent.RentStatus;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -24,12 +23,6 @@ public class RentInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column(name = "car_id")
-//    private Long carId;
-//
-//    @Column(name = "customer_id")
-//    private Long customerId;
-
     @Column(name = "customer_email")
     String email;
 
@@ -46,12 +39,9 @@ public class RentInfo {
     @Enumerated(EnumType.STRING)
     private RentStatus rentStatus;
 
-
-
     @Column(name = "Condition")
     @Enumerated(EnumType.STRING)
     private Condition condition;
-
 
     @Column(name = "update")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -63,18 +53,17 @@ public class RentInfo {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     LocalDateTime createdAt;
 
-
-    @JsonManagedReference(value = "rent")
-    @OneToOne(cascade = CascadeType.ALL)
-    //@JoinColumn(name = "car_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "car_id")
     Car car;
 
-
-
-    @JsonManagedReference(value = "rent")
-    @OneToOne(cascade = CascadeType.ALL)
+   //@JsonManagedReference(value = "rent")
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "customer_id")
     Customer customer;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id")
+    Payment payment;
 
 }

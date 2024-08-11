@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+
     @PostMapping("/add")
     @Operation(summary = "Регистрация пользователя")
     public CustomerInfoResponse addCustomer(@RequestBody CustomerInfoRequest request) {
@@ -22,7 +23,7 @@ public class CustomerController {
     }
 
     @GetMapping("/all")
-  //  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    //  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Получение списка пользователей")
     public List<CustomerInfoResponse> getAllCustomer() {
         return customerService.getAllCustomer();
@@ -33,16 +34,19 @@ public class CustomerController {
     public CustomerInfoResponse getCustomer(@PathVariable Long id) {
         return customerService.getCustomer(id);
     }
+
     @GetMapping("/find_by_email/{email}")
     @Operation(summary = "Выбор пользователя")
     public CustomerInfoResponse getCustomer(@PathVariable String email) {
         return customerService.getCustomer(email);
     }
+
     @PutMapping("/{id}")
     @Operation(summary = "Редактирование данных пользователя")
     public CustomerInfoResponse updateCustomer(@PathVariable Long id, @RequestBody @Valid CustomerInfoRequest request) {
         return customerService.updateCustomer(id, request);
     }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление пользователя")
     public void deleteCustomer(@PathVariable Long id) {

@@ -37,7 +37,9 @@ public class RentServiceImpl implements RentService {
     @Override
     public RentInfo addRent(RentInfoRequest rentInfoRequest) {
         RentInfo rentInfo = mapper.convertValue(rentInfoRequest, RentInfo.class);
-        Car car = mapper.convertValue(carRepo.findById(rentInfoRequest.getCarId()), Car.class);
+        Long check = (rentInfoRequest.getCarId());
+        carRepo.findById(check);
+        Car car = mapper.convertValue(carRepo.findById(check), Car.class);
         List<RentInfoResponse> rentInfo1 = getRentByCar(rentInfoRequest.getCarId());
         for (RentInfoResponse rentInfo2 : rentInfo1) {
             boolean compare1 = (rentInfo.getStartDateRent().isBefore(rentInfo2.getStartDateRent())) && (rentInfo2.getEndDateRent().isBefore(rentInfo.getEndDateRent()));
@@ -73,9 +75,6 @@ public class RentServiceImpl implements RentService {
 
     @Override
     public RentInfoResponse getRentForCustomer(String email) {
-
-
-
         return mapper.convertValue(rentInfoRepo.findByEmail(email), RentInfoResponse.class);
     }
 
@@ -105,6 +104,11 @@ public class RentServiceImpl implements RentService {
         rent.setUpdatedAt(LocalDateTime.now());
         rentInfoRepo.save(rent);
     }
+
+
+
+
+
 //    @Override
 //    public  RentInfoResponse closeRent(Long id, RentInfoRequest request){
 //        if (rentInfoRepo.findById(id).isEmpty()){

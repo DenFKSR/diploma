@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "car")
-
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,7 +58,7 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "Condition")
+    @Column(name = "condition")
     @Enumerated(EnumType.STRING)
     private Condition condition;
 
@@ -68,7 +67,6 @@ public class Car {
 
     @Column(name = "register_number")
     private String registerNumber;
-
 
     @Column(name = "update")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -80,11 +78,8 @@ public class Car {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     LocalDateTime createdAt;
 
-
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
     @JsonManagedReference
-//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
-//    @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
 
     @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)

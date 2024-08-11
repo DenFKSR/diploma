@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -61,8 +62,11 @@ public class Customer {
     @Column(name = "roles")
     private String roles;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
     @JsonBackReference(value = "rent")
     private RentInfo rent;
 
+    @OneToMany()
+    @JoinColumn(name = "payment_id")
+    private List<Payment> payment;
 }

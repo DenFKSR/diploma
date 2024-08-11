@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -47,9 +48,10 @@ public class CarServiceImpl implements CarService {
         BigDecimal price = car.getPrice();
         BigDecimal zero = new BigDecimal("0.00");
         BigDecimal hundred = new BigDecimal("100.00");
-        if ((zero.compareTo(price) < 0) || (price.compareTo(hundred) > 0)) {
-            throw new CustomException("the price should be in the range from 0 to 100", HttpStatus.CONFLICT);
-        }
+//        if ((zero.compareTo(price) < 0) || (price.compareTo(hundred) > 0)) {
+//            throw new CustomException("the price should be in the range from 0 to 100", HttpStatus.CONFLICT);
+//        }
+
         car.setCondition(Condition.CREATED);
         car.setStatus(Status.FREE);
         car.setCreatedAt(LocalDateTime.now());
@@ -59,7 +61,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarInfoResponse updateCar(Long id, CarInfoRequest request) {
-        Car car = mapper.convertValue(getCar(id), Car.class);
+        Car car = mapper.convertValue(carRepo.findById(id), Car.class);
         car.setBrand(request.getBrand() == null ? car.getBrand() : request.getBrand());
         car.setModel(request.getModel() == null ? car.getModel() : request.getModel());
         car.setYear(request.getYear() == null ? car.getYear() : request.getYear());
@@ -79,27 +81,21 @@ public class CarServiceImpl implements CarService {
     }
     @Override
     public void deleteCar(Long id) {
-        Car car = mapper.convertValue(getCar(id), Car.class);
         carRepo.findById(id).orElseThrow(() -> new CustomException(ERR_MSG, HttpStatus.NOT_FOUND));
+        Car car = mapper.convertValue(carRepo.findById(id), Car.class);
         car.setCondition(Condition.DELETED);
         car.setUpdatedAt(LocalDateTime.now());
         carRepo.save(car);
     }
     @Override
-    public CarInfoResponse getCar(Long id) {
-        return mapper.convertValue(carRepo.findById(id), CarInfoResponse.class);
+    public void deleteCarDB(Long id) {
+        carRepo.findById(id).orElseThrow(() -> new NoSuchElementException("машина не найден"));
+        carRepo.deleteCarById(id);
     }
     @Override
-    public List<CarInfoResponse> getAllCars() {
-        return carRepo.findAll()
-                .stream()
-                .map(car -> mapper.convertValue(car, CarInfoResponse.class))
-                .collect(Collectors.toList());
-
-    }
-    @Override
-    public List<CarInfoResponse> getFilterCars(String brand, String transmission, Integer year, Double price, String bodyType) {
-        return carRepo.findByFilters(brand, transmission, year, price, bodyType)
+    @Transactional
+    public List<CarInfoResponse> getFilterCars(String brand, String transmission, Integer year, Double price, String bodyType, Long id, String registerNumber) {
+        return carRepo.findByFilters(brand, transmission, year, price, bodyType, id,registerNumber )
                 .stream()
                 .map(car -> mapper.convertValue(car, CarInfoResponse.class))
                 .collect(Collectors.toList());
@@ -128,7 +124,7 @@ public class CarServiceImpl implements CarService {
     }
     @Override
     public ArrayList getAddress(Long id) {
-        Car car = mapper.convertValue(getCar(id), Car.class);
+        Car car = mapper.convertValue(carRepo.findById(id), Car.class);
         double number = Math.random() * 100;
         int num2 = (int) number;
         double memArray = Math.random() * 10;

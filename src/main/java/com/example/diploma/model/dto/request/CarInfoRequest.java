@@ -33,8 +33,6 @@ public class CarInfoRequest {
 
     private Status status;
 
-    private Condition statusCondition;
-
     private String address;
 
     private String registerNumber;

@@ -65,7 +65,6 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageRepo.findById(imageId).orElseThrow(() -> new NoSuchElementException("File not found"));
         Car car = carRepo.findById(carId).orElseThrow(() -> new NoSuchElementException("File not found"));
         car.setImage(image);
-        carRepo.save(car);
         image.setCar(car);
         carRepo.save(car);
         imageRepo.save(image);

@@ -22,5 +22,4 @@ public class RentInfoResponse {
     Condition condition;
     CarInfoResponseSh car;
     CustomerInfoResponseSh customer;
-
 }

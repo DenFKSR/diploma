@@ -26,19 +26,6 @@ public class CarController {
         return carService.addCar(request);
     }
 
-    @GetMapping("/all")
-    @Operation(summary = "Получение списка автомобилей")
-    public List<CarInfoResponse> getAllCars() {
-        return carService.getAllCars();
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Выбор автомобиля(все данные для администрации)")
-    public CarInfoResponse getCar(@PathVariable Long id) {
-        return carService.getCar(id);
-    }
-
-
     @GetMapping("/new/{id}")
     @Operation(summary = "Выбор автомобиля для пользователя")
     public List<String> getNewCar(@PathVariable Long id) {
@@ -58,8 +45,10 @@ public class CarController {
              @RequestParam(required = false) String transmission,
              @RequestParam(required = false) Integer year,
              @RequestParam(required = false) Double price,
-             @RequestParam(required = false) String bodyType) {
-        return carService.getFilterCars(brand, transmission, year, price, bodyType);
+             @RequestParam(required = false) String bodyType,
+             @RequestParam(required = false) Long id,
+             @RequestParam(required = false) String registerNumber) {
+        return carService.getFilterCars(brand, transmission, year, price, bodyType, id,registerNumber);
     }
 
     @DeleteMapping("/{id}")
@@ -67,6 +56,13 @@ public class CarController {
     public void deleteCar(@PathVariable Long id) {
         carService.deleteCar(id);
     }
+
+    @DeleteMapping("/deleteObject/{id}")
+    @Operation(summary = "Удаление автомобиля из БД")
+    public void deleteCarDB(@PathVariable Long id) {
+        carService.deleteCarDB(id);
+    }
+
 
     @PutMapping("/location/{id}")
     @Operation(summary = "Выбор автомобиля")
